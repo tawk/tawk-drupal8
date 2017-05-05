@@ -1,0 +1,5 @@
+services:
+    tawk_to.chat_generator:
+        class: Drupal\tawk_to\core\TawktoGenerator
+    tawk_to.admin_settings:
+        class: Drupal\tawk_to\Controller\TawktoController

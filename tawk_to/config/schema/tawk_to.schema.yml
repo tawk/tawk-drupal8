@@ -1,0 +1,18 @@
+tawk_to.settings:
+  type: config_object
+  label: 'tawk.to settings'
+  mapping:
+    tawk_to:
+      type: mapping
+      mapping:
+        page_id:
+          type: text
+          label: 'Page ID:'
+        widget_id:
+          type: text
+          label: 'Widget ID:'
+block.settings.tawk_to_block:
+  type: block_settings
+  label: 'tawk.to block'
+  mapping:
+    tawk_to_block_settings:

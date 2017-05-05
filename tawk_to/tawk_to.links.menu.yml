@@ -1,0 +1,6 @@
+tawk_to.admin:
+  title: 'tawk.to module settings'
+  description: 'admin settings page'
+  parent: system.admin_config_development
+  route_name: tawk_to.settings
+  weight: 100

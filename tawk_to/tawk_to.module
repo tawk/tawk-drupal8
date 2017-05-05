@@ -1,0 +1,41 @@
+<?php
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\tawk_to\core\TawktoGenerator;
+
+/**
+ * Implements hook_help().
+ */
+function tawk_to_help($route_name, RouteMatchInterface $route_match)
+{
+    if ($route_name !== 'tawk_to.help') {
+        return;
+    }
+
+    $links = [
+        ':homepage' => 'https://tawk.to',
+        ':dashboard' => 'https://dashboard.tawk.to',
+        ':project_page' => 'https://www.drupal.org/sandbox/tawk/2205433',
+        ':mail_link' => 'support@tawk.to',
+    ];
+    $output = '';
+
+    $output .= '<h3>' . t('About tawk.to') . '</h3>';
+    $output .= '<p>' . t('tawk.to Drupal module allows you to easily choose which one of your tawk.to widgets you
+    want to use on your drupal page. To create account please visit <a href=":project">https://tawk.to</a>.<br />
+    To answer chat go to <a href="dashboard">https://dashboard.tawk.to</a>.<br />
+    * For a full description of the module, visit the project page:<br />
+    <a href=":project_page">https://www.drupal.org/sandbox/tawk/2205433</a><br /><br />
+    * To submit bug reports and feature suggestions, or to track changes please email support@tawk.to
+    ', $links) . '</p>';
+
+    return $output;
+}
+
+function tawk_to_page_bottom(array &$page_bottom) {
+    $generator = new TawktoGenerator;
+    $page_bottom['tawk_to'] = array(
+            '#type' => 'inline_template',
+            '#template' => $generator->widget()
+        );
+}
