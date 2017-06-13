@@ -1,0 +1,10 @@
+name: tawk.to Module
+type: module
+description: "Enables the user to add the tawk.to chat widget on the frontend"
+package: Custom
+configure: tawk_to.settings
+tags: 
+  - tawk
+  - chat
+core: 8.x
+project: 'tawk'
