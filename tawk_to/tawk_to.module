@@ -52,12 +52,35 @@ function tawk_to_page_bottom(array &$page_bottom)
             $options = json_decode($options);
             
             // prepare visibility
+            $currentUrl = $base_url.$_SERVER["REQUEST_URI"];
             if (false==$options->always_display) {
-                $currentUrl = $base_url.$_SERVER["REQUEST_URI"];
 
+                $showPages = json_decode($options->show_oncustom);
+                $show = false;
+                foreach ($showPages as $slug) {
+                    if (empty(trim($slug))) {
+                        continue;
+                    }
+
+                    // if (stripos($currentUrl, $slug)!==false) {
+                    if ($currentUrl == $slug) {
+                        $show = true;
+                        break;
+                    }
+                }
+
+                // check if category/taxonomy page
+                // taxonomy page
+                if ("taxonomy_term" == strtolower(\Drupal::request()->attributes->get('view_id'))) {
+                    if (false != $options->show_oncategory) {
+                        $show = true;
+                    }
+                }
+
+                // check if frontpage
                 if (\Drupal::service('path.matcher')->isFrontPage()) {
-                    if (false==$options->show_onfrontpage) {
-                        return;
+                    if (false != $options->show_onfrontpage) {
+                        $show = true;
                     }                
                 }
                 
@@ -71,11 +94,26 @@ function tawk_to_page_bottom(array &$page_bottom)
                 // $current_path = \Drupal::service('path.current')->getPath();
                 // $path_args = explode('/', $current_path);
                 
-                $showPages = json_decode($options->show_oncustom);
-                $show = false;
-                foreach ($showPages as $slug) {
-                    if (stripos($currentUrl, $slug)!==false) {
-                        $show = true;
+                if (!$show) {
+                    return;
+                }
+            } else {
+                $hide_pages = json_decode($options->hide_oncustom);
+                $show = true;
+                
+                // $currentUrl = urlencode($current_page);
+                $currentUrl = (string) $currentUrl;
+                foreach ($hide_pages as $slug) {
+
+                    if (empty(trim($slug))) {
+                        continue;
+                    }
+                    
+                    $slug = (string) htmlspecialchars($slug); // we need to add htmlspecialchars due to slashes added when saving to database
+                    
+                    // if (stripos($currentUrl, $slug)!==false) {
+                    if ($currentUrl == $slug) {
+                        $show = false;
                         break;
                     }
                 }
