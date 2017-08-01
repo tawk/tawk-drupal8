@@ -30,6 +30,14 @@ tawk_to.remove_widget:
     requirements:
         _permission: 'administer site configuration'
 
+tawk_to.set_options:
+    path: /admin/config/tawk_to/set_options
+    defaults:
+        _controller: Drupal\tawk_to\Controller\TawktoController::set_options
+        _title: 'Set tawk.to widget options'
+    requirements:
+        _permission: 'administer site configuration'
+
 # tawk_to.help:
 #     path: /admin/config/tawk_to/help
 #     defaults:

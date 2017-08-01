@@ -25,8 +25,9 @@ class TawktoController extends ControllerBase
 
         $keyValueSvc = $this->keyValue('tawk_to');
         // $keyValueSvc->set('widget', '<script>the widget is this</script>');
-        $widge = $keyValueSvc->get('widget');
-        return new Response($widge);
+        $widget = $keyValueSvc->get('widget');
+
+        return new Response($widget);
     }
 
     public function widget()
@@ -97,6 +98,15 @@ class TawktoController extends ControllerBase
             }
         }
     }
+
+    public function set_options()
+    {
+        if (!empty($_REQUEST['options']) && 'POST' == $_SERVER["REQUEST_METHOD"]) {
+            $options = trim($_REQUEST['options']);
+            return $this->generator->setOptions($options);
+        }
+    }
+
 
     private function _remove()
     {
