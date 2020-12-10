@@ -372,9 +372,9 @@ class TawktoGenerator
         $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
         $config->set('tawk_to.page_id', 0);
         $config->set('tawk_to.widget_id', 0);
-        $config->set('tawk_to.user_id', 0);
+        $config->set('tawk_to.user_id', null);
         // $config->set('tawk_to.options', 0);
-        
+
         $config->save();
 
         $options = array('success' => true);
