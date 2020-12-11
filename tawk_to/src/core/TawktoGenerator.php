@@ -13,12 +13,6 @@ class TawktoGenerator
 {
     public function widget()
     {
-        // // Default settings.
-        // $config = \Drupal::config('tawk_to.settings');
-        // // Page title and source text.
-        // $page_id = $config->get('tawk_to.page_id');
-        // $widget_id = $config->get('tawk_to.widget_id');
-
         return $this->getWidget();
     }
 
@@ -105,7 +99,6 @@ class TawktoGenerator
         $vars = $this->getWidgetVars();
         extract($vars);
 
-        // $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
         $sameUser = false;
         if (is_null($user_id) || \Drupal::currentUser()->id()==$user_id) {
             $sameUser = true;
@@ -323,10 +316,6 @@ class TawktoGenerator
 
     public function getWidgetVars()
     {
-        // return array(
-        //         'page_id' => \Drupal::state()->get(TAWK_TO_WIDGET_PID),
-        //         'widget_id' => \Drupal::state()->get(TAWK_TO_WIDGET_WID),
-        //     );
         $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
         return array(
                 'page_id' => $config->get('tawk_to.page_id'),
@@ -351,17 +340,11 @@ class TawktoGenerator
             return new JsonResponse($options);
         }
 
-        // $config = $this->config('tawk_to.settings');
         $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
         $config->set('tawk_to.page_id', $page);
         $config->set('tawk_to.widget_id', $widget);
         $config->set('tawk_to.user_id', \Drupal::currentUser()->id());
-        // $config->set('tawk_to.options', $options);
-        //
         $config->save();
-
-        // \Drupal::state()->set(TAWK_TO_WIDGET_PID, $page);
-        // \Drupal::state()->set(TAWK_TO_WIDGET_WID, $widget);
 
         $options = array('success' => true);
         return new JsonResponse($options);
@@ -373,7 +356,6 @@ class TawktoGenerator
         $config->set('tawk_to.page_id', 0);
         $config->set('tawk_to.widget_id', 0);
         $config->set('tawk_to.user_id', null);
-        // $config->set('tawk_to.options', 0);
 
         $config->save();
 
@@ -411,7 +393,6 @@ class TawktoGenerator
                 case 'show_onfrontpage':
                 case 'show_oncategory':
                 case 'always_display':
-                // default:
                     $jsonOpts[$column] = ($value==1)?true:false;
                     break;
             }
