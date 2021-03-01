@@ -18,10 +18,10 @@ class TawktoGenerator
         // // Page title and source text.
         // $page_id = $config->get('tawk_to.page_id');
         // $widget_id = $config->get('tawk_to.widget_id');
-        
+
         return $this->getWidget();
     }
-    
+
 
     /**
      * Return widget details from the database.
@@ -33,16 +33,28 @@ class TawktoGenerator
         if (!$page_id || !$widget_id) {
             return '';
         }
-        
-        $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
-        if ($user) {
-            $username = $user->get('name')->value;
-            $usermail = $user->get('mail')->value;
 
-            $apiString = '$_Tawk_API.visitor = {
-                name  : "'.$username.'",
-                email : "'.$usermail.'",
-            };';
+        $display_opts = $options;
+        $enable_visitor_recognition = true; // default value
+        if (!is_null($display_opts)) {
+            $display_opts = json_decode($display_opts);
+
+            if (!is_null($display_opts->enable_visitor_recognition)) {
+                $enable_visitor_recognition = $display_opts->enable_visitor_recognition;
+            }
+        }
+
+        if ($enable_visitor_recognition) {
+            $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
+            if ($user) {
+                $username = $user->get('name')->value;
+                $usermail = $user->get('mail')->value;
+
+                $apiString = '$_Tawk_API.visitor = {
+                    name  : "'.$username.'",
+                    email : "'.$usermail.'",
+                };';
+            }
         }
 
         ob_start();
@@ -117,6 +129,18 @@ class TawktoGenerator
         ?>
         <link href="https://plugins.tawk.to/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <style>
+            #module_form .checkbox {
+                display: inline-block;
+                min-height: 20px;
+            }
+
+            @media only screen and (min-width: 1200px) {
+                #module_form .checkbox {
+                    display: block;
+                }
+            }
+        </style>
         <?php if (!$sameUser) : ?>
             <div id="widget_already_set" style="width: 100%; float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold; margin: 20px 0;" class="alert alert-warning">Notice: Widget already set by other user</div>
         <?php endif; ?>
@@ -129,14 +153,13 @@ class TawktoGenerator
             <div class="row">
                 <div class="col-lg-8">
                     <form id="module_form" class="form-horizontal" action="" method="post">
-                        <div class="panel panel-default" id="fieldset_1">
-                            <div class="form-group col-lg-12">
+                        <div id="fieldset_1">
+                            <div class="panel form-group col-xs-12">
                                 <div class="panel-heading"><strong>Visibility Settings</strong></div>
                             </div>
-                            <br>
-                            <div class="form-group col-lg-12">
-                                <label for="always_display" class="col-lg-6 control-label">Always show Tawk.To widget on every page</label>
-                                <div class="col-lg-6 control-label ">
+                            <div class="form-group col-xs-12">
+                                <label for="always_display" class="col-xs-6 control-label">Always show Tawk.To widget on every page</label>
+                                <div class="col-xs-6 control-label ">
                                     <?php
                                     $checked = true;
                                     if (!is_null($display_opts)) {
@@ -145,17 +168,17 @@ class TawktoGenerator
                                         }
                                     }
                                     ?>
-                                    <input type="checkbox" class="col-lg-6" name="always_display" id="always_display" value="1" 
+                                    <input type="checkbox" class="checkbox" name="always_display" id="always_display" value="1"
                                         <?php echo ($checked)?'checked':'';?> />
                                 </div>
                             </div>
 
-                            <div class="form-group col-lg-12">
-                                <label for="hide_oncustom" class="col-lg-6 control-label">Except on pages:</label>
-                                <div class="col-lg-6 control-label">
+                            <div class="form-group col-xs-12">
+                                <label for="hide_oncustom" class="col-xs-6 control-label">Except on pages:</label>
+                                <div class="col-xs-6 control-label">
                                     <?php if (!empty($display_opts->hide_oncustom)) : ?>
                                         <?php $whitelist = json_decode($display_opts->hide_oncustom) ?>
-                                        <textarea class="form-control hide_specific" name="hide_oncustom" 
+                                        <textarea class="form-control hide_specific" name="hide_oncustom"
                                             id="hide_oncustom" cols="30" rows="10"><?php foreach ($whitelist as $page) { echo $page."\r\n"; } ?></textarea>
                                     <?php else : ?>
                                         <textarea class="form-control hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
@@ -168,9 +191,9 @@ class TawktoGenerator
                                 </div>
                             </div>
 
-                            <div class="form-group col-lg-12">
-                                <label for="show_onfrontpage" class="col-lg-6 control-label">Show on frontpage</label>
-                                <div class="col-lg-6 control-label ">
+                            <div class="form-group col-xs-12">
+                                <label for="show_onfrontpage" class="col-xs-6 control-label">Show on frontpage</label>
+                                <div class="col-xs-6 control-label ">
                                     <?php
                                     $checked = false;
                                     if (!is_null($display_opts)) {
@@ -179,15 +202,15 @@ class TawktoGenerator
                                         }
                                     }
                                     ?>
-                                    <input type="checkbox" class="col-lg-6 show_specific" name="show_onfrontpage" 
-                                        id="show_onfrontpage" value="1" 
+                                    <input type="checkbox" class="checkbox show_specific" name="show_onfrontpage"
+                                        id="show_onfrontpage" value="1"
                                         <?php echo ($checked)?'checked':'';?> />
                                 </div>
                             </div>
-                            
-                            <div class="form-group col-lg-12">
-                                <label for="show_oncategory" class="col-lg-6 control-label">Show on category pages</label>
-                                <div class="col-lg-6 control-label ">
+
+                            <div class="form-group col-xs-12">
+                                <label for="show_oncategory" class="col-xs-6 control-label">Show on category pages</label>
+                                <div class="col-xs-6 control-label ">
                                     <?php
                                     $checked = false;
                                     if (!is_null($display_opts)) {
@@ -196,17 +219,17 @@ class TawktoGenerator
                                         }
                                     }
                                     ?>
-                                    <input type="checkbox" class="col-lg-6 show_specific" name="show_oncategory" id="show_oncategory" value="1" 
+                                    <input type="checkbox" class="checkbox show_specific" name="show_oncategory" id="show_oncategory" value="1"
                                         <?php echo ($checked)?'checked':'';?>  />
                                 </div>
                             </div>
-                            
-                            <div class="form-group col-lg-12">
-                                <label for="show_oncustom" class="col-lg-6 control-label">Show on pages:</label>
-                                <div class="col-lg-6 control-label">
+
+                            <div class="form-group col-xs-12">
+                                <label for="show_oncustom" class="col-xs-6 control-label">Show on pages:</label>
+                                <div class="col-xs-6 control-label">
                                     <?php if (isset($display_opts->show_oncustom) && !empty($display_opts->show_oncustom)) : ?>
                                         <?php $whitelist = json_decode($display_opts->show_oncustom) ?>
-                                        <textarea class="form-control show_specific" name="show_oncustom" id="show_oncustom" cols="30" 
+                                        <textarea class="form-control show_specific" name="show_oncustom" id="show_oncustom" cols="30"
                                             rows="10"><?php foreach ($whitelist as $page) { echo $page."\r\n"; } ?></textarea>
                                     <?php else : ?>
                                         <textarea class="form-control show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
@@ -219,15 +242,34 @@ class TawktoGenerator
                                 </div>
                             </div>
                         </div>
-                        <div class="panel-footer" style="position: relative; overflow: hidden; width: 100%; padding: 5px 0;">
-                            <div id="optionsSuccessMessage" style="position:absolute;top:0;left;0;background-color: #dff0d8; color: #3c763d; border-color: #d6e9c6; font-weight: bold; display: none;" class="alert alert-success col-lg-5">Successfully set widget options to your site</div>
-                            <label for="show_oncustom" class="col-lg-6 control-label"></label>
-                            <div class="form-group">
-                                <button type="submit" value="1" id="module_form_submit_btn" name="submitBlockCategories" class="btn btn-default pull-right"><i class="process-icon-save"></i> Save</button>    
+                        <div id="fieldset_2">
+                            <div class="panel form-group col-xs-12">
+                                <div class="panel-heading"><strong>Privacy Options</strong></div>
+                            </div>
+                            <div class="form-group col-xs-12">
+                                <label for="enable_visitor_recognition" class="col-xs-6 control-label">Enable Visitor Recognition</label>
+                                <div class="col-xs-6 control-label">
+                                    <?php
+                                        $checked = 'checked';
+                                        if (!is_null($display_opts) && !$display_opts->enable_visitor_recognition) {
+                                            $checked = '';
+                                        }
+                                    ?>
+                                    <input type="checkbox" class="checkbox" name="enable_visitor_recognition" id="enable_visitor_recognition" value="1"
+                                        <?php echo $checked ?> />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="col-lg-6 col-xs-12" style="text-align: right; margin-bottom: 10px;">
+                                <button type="submit" value="1" id="module_form_submit_btn" name="submitBlockCategories" class="btn btn-default pull-right"><i class="process-icon-save"></i> Save</button>
+                            </div>
+                            <div class="form-group col-lg-6 col-xs-12" style="min-height: 60px;">
+                                <div id="optionsSuccessMessage" style="background-color: #dff0d8; color: #3c763d; border-color: #d6e9c6; font-weight: bold; display: none;" class="alert alert-success col-lg-12">Successfully set widget options to your site</div>
                             </div>
                         </div>
                     </form>
-                    
+
                 </div>
                 <div class="col-lg-4"></div>
             </div>
@@ -344,7 +386,7 @@ class TawktoGenerator
             return new JsonResponse($options);
         }
 
-        if (preg_match('/^[0-9A-Fa-f]{24}$/', $page) !== 1 
+        if (preg_match('/^[0-9A-Fa-f]{24}$/', $page) !== 1
             || preg_match('/^[a-z0-9]{1,50}$/i', $widget) !== 1) {
             return new JsonResponse($options);
         }
@@ -355,7 +397,7 @@ class TawktoGenerator
         $config->set('tawk_to.widget_id', $widget);
         $config->set('tawk_to.user_id', \Drupal::currentUser()->id());
         // $config->set('tawk_to.options', $options);
-        // 
+        //
         $config->save();
 
         // \Drupal::state()->set(TAWK_TO_WIDGET_PID, $page);
@@ -372,7 +414,7 @@ class TawktoGenerator
         $config->set('tawk_to.widget_id', 0);
         $config->set('tawk_to.user_id', 0);
         // $config->set('tawk_to.options', 0);
-        
+
         $config->save();
 
         $options = array('success' => true);
@@ -390,6 +432,7 @@ class TawktoGenerator
                 'show_onfrontpage' => false,
                 'show_oncategory' => false,
                 'show_oncustom' => array(),
+                'enable_visitor_recognition' => false
             );
 
         $options = explode('&', $options);
@@ -402,15 +445,15 @@ class TawktoGenerator
                     $value = urldecode($value);
                     $value = str_ireplace(["\r\n", "\r", "\n"], ',', $value);
                     $value = explode(",", $value);
-                    $value = (empty($value)||!$value)?array():$value;
+                    $value = (empty($value) || !$value) ? array() : $value;
                     $jsonOpts[$column] = json_encode($value);
                     break;
-                
+
                 case 'show_onfrontpage':
                 case 'show_oncategory':
                 case 'always_display':
-                // default:
-                    $jsonOpts[$column] = ($value==1)?true:false;
+                case 'enable_visitor_recognition':
+                    $jsonOpts[$column] = $value == 1;
                     break;
             }
         }
