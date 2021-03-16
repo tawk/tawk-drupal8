@@ -2,6 +2,7 @@
 namespace Drupal\tawk_to\core;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use \Drupal\Core\Cache\Cache;
 
 define('TAWK_TO_WIDGET_PID', 'tawk_to_widget_pid'); // page ID
 define('TAWK_TO_WIDGET_WID', 'tawk_to_widget_wid'); // widget ID
@@ -13,12 +14,6 @@ class TawktoGenerator
 {
     public function widget()
     {
-        // // Default settings.
-        // $config = \Drupal::config('tawk_to.settings');
-        // // Page title and source text.
-        // $page_id = $config->get('tawk_to.page_id');
-        // $widget_id = $config->get('tawk_to.widget_id');
-
         return $this->getWidget();
     }
 
@@ -31,6 +26,10 @@ class TawktoGenerator
         $widgetVars = $this->getWidgetVars();
         extract($widgetVars);
         if (!$page_id || !$widget_id) {
+            return '';
+        }
+
+        if (!$this->shouldDisplayWidget($options)) {
             return '';
         }
 
@@ -77,6 +76,69 @@ class TawktoGenerator
         return $output;
     }
 
+    private function shouldDisplayWidget($options = null)
+    {
+        if (!$options || is_null($options)) {
+            return true; // since always_show's default value is true
+        }
+
+        global $base_url;
+        $options = json_decode($options);
+        $show = false;
+
+        // prepare visibility
+        $currentUrl = $base_url.$_SERVER["REQUEST_URI"];
+        if ($options->always_display == false) {
+
+            $showPages = json_decode($options->show_oncustom);
+            foreach ($showPages as $slug) {
+                if (empty(trim($slug))) {
+                    continue;
+                }
+
+                if ($currentUrl == $slug) {
+                    $show = true;
+                    break;
+                }
+            }
+
+            // check if category/taxonomy page
+            // taxonomy page
+            if ("taxonomy_term" == strtolower(\Drupal::request()->attributes->get('view_id'))) {
+                if (false != $options->show_oncategory) {
+                    $show = true;
+                }
+            }
+
+            // check if frontpage
+            if (\Drupal::service('path.matcher')->isFrontPage()) {
+                if (false != $options->show_onfrontpage) {
+                    $show = true;
+                }
+            }
+        } else {
+            $hide_pages = json_decode($options->hide_oncustom);
+            $show = true;
+
+            $currentUrl = (string) $currentUrl;
+            foreach ($hide_pages as $slug) {
+
+                if (empty(trim($slug))) {
+                    continue;
+                }
+
+                $slug = (string) htmlspecialchars($slug); // we need to add htmlspecialchars due to slashes added when saving to database
+
+                if ($currentUrl == $slug) {
+                    $show = false;
+                    break;
+                }
+            }
+        }
+
+        return $show;
+    }
+
     public function settings()
     {
         // Default settings.
@@ -91,13 +153,15 @@ class TawktoGenerator
      */
     public function getIframeUrl()
     {
-      if (!$widget = $this->getWidgetVars()) {
-        $widget = array(
+        $widget = $this->getWidgetVars();
+        extract($widget);
+        if (!$page_id || !$widget_id) {
+            $widget = array(
                 'page_id'   => '',
                 'widget_id' => '',
             );
-      }
-      return $this->getBaseUrl() . '/generic/widgets?currentWidgetId=' . $widget['widget_id'] . '&currentPageId=' . $widget['page_id'];
+        }
+        return $this->getBaseUrl() . '/generic/widgets?currentWidgetId=' . $widget['widget_id'] . '&currentPageId=' . $widget['page_id'];
     }
 
     /**
@@ -115,7 +179,6 @@ class TawktoGenerator
         $vars = $this->getWidgetVars();
         extract($vars);
 
-        // $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
         $sameUser = false;
         if (is_null($user_id) || \Drupal::currentUser()->id()==$user_id) {
             $sameUser = true;
@@ -363,10 +426,6 @@ class TawktoGenerator
 
     public function getWidgetVars()
     {
-        // return array(
-        //         'page_id' => \Drupal::state()->get(TAWK_TO_WIDGET_PID),
-        //         'widget_id' => \Drupal::state()->get(TAWK_TO_WIDGET_WID),
-        //     );
         $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
         return array(
                 'page_id' => $config->get('tawk_to.page_id'),
@@ -391,17 +450,13 @@ class TawktoGenerator
             return new JsonResponse($options);
         }
 
-        // $config = $this->config('tawk_to.settings');
         $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
         $config->set('tawk_to.page_id', $page);
         $config->set('tawk_to.widget_id', $widget);
         $config->set('tawk_to.user_id', \Drupal::currentUser()->id());
-        // $config->set('tawk_to.options', $options);
-        //
         $config->save();
 
-        // \Drupal::state()->set(TAWK_TO_WIDGET_PID, $page);
-        // \Drupal::state()->set(TAWK_TO_WIDGET_WID, $widget);
+        Cache::invalidateTags(array('tawk_widget'));
 
         $options = array('success' => true);
         return new JsonResponse($options);
@@ -412,10 +467,11 @@ class TawktoGenerator
         $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
         $config->set('tawk_to.page_id', 0);
         $config->set('tawk_to.widget_id', 0);
-        $config->set('tawk_to.user_id', 0);
-        // $config->set('tawk_to.options', 0);
+        $config->set('tawk_to.user_id', null);
 
         $config->save();
+
+        Cache::invalidateTags(array('tawk_widget'));
 
         $options = array('success' => true);
         return new JsonResponse($options);
@@ -460,6 +516,8 @@ class TawktoGenerator
         $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
         $config->set('tawk_to.options', json_encode($jsonOpts));
         $config->save();
+
+        Cache::invalidateTags(array('tawk_widget'));
 
         return new JsonResponse(array('success' => true));
     }

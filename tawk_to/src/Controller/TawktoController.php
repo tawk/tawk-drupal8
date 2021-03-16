@@ -19,7 +19,7 @@ class TawktoController extends ControllerBase
     }
 
     public function admin()
-    {   
+    {
         $widget = $this->generator->widget();
         $this->loggerFactory->get('default')->debug($widget);
 
