@@ -346,14 +346,17 @@ class TawktoGenerator
         var iframe = jQuery("#tawk_widget_customization")[0];
 
         window.addEventListener("message", function(e) {
-        if(e.origin === "<?php echo $baseUrl; ?>") {
-            if(e.data.action === "setWidget") {
-                setWidget(e);
+            if(e.origin === "<?php echo $baseUrl; ?>") {
+                if(e.data.action === "setWidget") {
+                    setWidget(e);
+                }
+                if(e.data.action === "removeWidget") {
+                    removeWidget(e);
+                }
+                if(e.data.action === 'reloadHeight') {
+                    reloadIframeHeight(e.data.height);
+                }
             }
-            if(e.data.action === "removeWidget") {
-                removeWidget(e);
-            }
-        }
         });
 
         function setWidget(e) {
@@ -379,6 +382,19 @@ class TawktoGenerator
                 e.source.postMessage({action: "removeFail"}, "<?php echo $baseUrl; ?>");
             }
             });
+        }
+
+        function reloadIframeHeight(height) {
+            if (!height) {
+                return;
+            }
+
+            var iframe = jQuery('#tawkIframe');
+            if (height === iframe.height()) {
+                return;
+            }
+
+            iframe.height(height);
         }
 
         jQuery(document).ready(function() {
