@@ -339,7 +339,7 @@ class TawktoGenerator
         </div>
         <script>
         var currentHost = window.location.protocol + "//" + window.location.host;
-        var url = "<?php echo $iframeUrl; ?>&parentDomain=" + currentHost;
+        var url = "<?php echo $iframeUrl; ?>&platform=drupal8&parentDomain=" + currentHost;
 
         jQuery("#tawkIframe").attr("src", url);
 
