@@ -13,21 +13,19 @@ Don't have a tawk.to account yet? [Create one here.](https://www.tawk.to/?utm_so
 
 ## Installation
 
-### Requirements
-- Download the module [here](https://www.drupal.org/project/tawkto).
-
 ### Module Installer
-1. Log in to the your administration panel and click on `Extend`.
-2. In the module list, click on the `Install new module` button.
-3. Click on `Choose File`, select the downloaded module, and click on the `Install` button.
-4. After the installation completes, click on `Enable newly added modules`.
+1. Download the [plugin module](https://www.drupal.org/project/tawkto).
+2. Log in to the your administration panel and click on `Extend`.
+3. In the module list, click on the `Install new module` button.
+4. Click on `Choose File`, select the downloaded module, and click on the `Install` button.
+5. After the installation completes, click on `Enable newly added modules`.
 
 ### Manual Installation
-1. Extract the contents of the downloaded module.
+1. Download the [plugin module](https://www.drupal.org/project/tawkto) and extract the contents of the downloaded module.
 2. In the extracted files, copy the `tawkto` directory to the `<DRUPAL_INSTALLATION>/modules` directory.
 3. Log in to the your administration panel and click on `Extend`.
 4. In the module list, search for `tawk.to` and enable the module by ticking the checkbox beside `tawk.to Module`.
-5. Click on `Install` button to finalize the enabled modules.
+5. Click on `Install` button to complete the installation.
 
 ### Configuration
 1. In your administration panel, go to `Configuration`.
