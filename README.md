@@ -13,23 +13,26 @@ Don't have a tawk.to account yet? [Create one here.](https://www.tawk.to/?utm_so
 
 ## Installation
 
+### Requirements
+- Download the module [here](https://www.drupal.org/project/tawkto).
+
 ### Module Installer
-1. Log in to the Drupal 8 administration panel and click on `Extend`.
+1. Log in to the your administration panel and click on `Extend`.
 2. In the module list, click on the `Install new module` button.
-3. Click the `Choose File` button and select the downloaded module zip file. Then click on `Install`.
+3. Click on `Choose File`, select the downloaded module, and click on the `Install` button.
 4. After the installation completes, click on `Enable newly added modules`.
 
 ### Manual Installation
-1. Download the module [here](https://www.drupal.org/project/tawkto).
-2. Extract and copy the `tawkto` directory to the `<DRUPAL_INSTALLATION>/modules` directory.
-3. Log in to the Drupal 8 administration panel and click on Modules.
-4. Search for `tawk.to` and tick the checkbox.
-5. Click on `Install`.
+1. Extract the contents of the downloaded module.
+2. In the extracted files, copy the `tawkto` directory to the `<DRUPAL_INSTALLATION>/modules` directory.
+3. Log in to the your administration panel and click on `Extend`.
+4. In the module list, search for `tawk.to` and enable the module by ticking the checkbox beside `tawk.to Module`.
+5. Click on `Install` button to finalize the enabled modules.
 
 ### Configuration
-1. In the main menu, click on `Configuration`.
-2. Expand the `Development` selection and select `tawk.to module settings`.
-3. After logging into your tawk.to account, you will be able to select which widget to display.
+1. In your administration panel, go to `Configuration`.
+2. In the configuration page, go to `tawk.to module settings` which is under the `Development` section.
+3. Log in to your tawk.to account and you will be able to select which widget to display.
 
 ## Frequently Asked Questions
 Visit our [Help Center](https://help.tawk.to) for answers to FAQs.
