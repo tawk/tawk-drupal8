@@ -272,7 +272,7 @@ class TawktoGenerator
                                     <?php endif; ?>
                                     <br>
                                     <div style="text-align: justify;">
-                                        Add URLs to pages in which you would like to hide the widget. ( if "always show" is checked )<br>
+                                        Add URLs/paths to pages in which you would like to hide the widget.<br>
                                         Put each URL/path in a new line. Paths should have a leading '/'.
                                         <br>
                                         <div class="tooltip">
@@ -352,7 +352,7 @@ class TawktoGenerator
                                     <?php endif; ?>
                                     <br>
                                     <div style="text-align: justify;">
-                                        Add URLs to pages in which you would like to show the widget.<br>
+                                        Add URLs/paths to pages in which you would like to show the widget.<br>
                                         Put each URL/path in a new line. Paths should have a leading '/'.
                                         <br>
                                         <div class="tooltip">
