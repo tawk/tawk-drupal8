@@ -1,0 +1,20 @@
+{
+    "name": "tawk/tawk-drupal8",
+    "description": "tawk.to Live Chat module for Drupal 8 CMS",
+    "type": "project",
+    "license": "GPLv3",
+    "require": {
+        "tawk/url-utils": "2.0.1"
+    },
+    "repositories": {
+        "tawk-url-utils": {
+            "type": "vcs",
+            "url": "https://github.com/tawk/tawk-url-utils.git"
+        }
+    },
+    "scripts": {
+        "build:prod": "COMPOSER_VENDOR_DIR=./tawk_to/vendor composer install --no-dev",
+        "package": "composer run clean && mkdir -p ./tmp && cp -r ./tawk_to ./tmp && (cd ./tmp && zip -9 -rq ./tawk_to.zip ./tawk_to)",
+        "clean": "rm -rf ./tmp"
+    }
+}

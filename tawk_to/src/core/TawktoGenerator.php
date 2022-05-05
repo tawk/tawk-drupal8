@@ -1,8 +1,11 @@
 <?php
 namespace Drupal\tawk_to\core;
 
+require_once drupal_get_path('module', 'tawk_to').'/vendor/autoload.php';
+
 use Symfony\Component\HttpFoundation\JsonResponse;
 use \Drupal\Core\Cache\Cache;
+use Tawk\Modules\UrlPatternMatcher;
 
 define('TAWK_TO_WIDGET_PID', 'tawk_to_widget_pid'); // page ID
 define('TAWK_TO_WIDGET_WID', 'tawk_to_widget_wid'); // widget ID
@@ -89,17 +92,8 @@ class TawktoGenerator
         // prepare visibility
         $currentUrl = $base_url.$_SERVER["REQUEST_URI"];
         if ($options->always_display == false) {
-
-            $showPages = json_decode($options->show_oncustom);
-            foreach ($showPages as $slug) {
-                if (empty(trim($slug))) {
-                    continue;
-                }
-
-                if ($currentUrl == $slug) {
-                    $show = true;
-                    break;
-                }
+            if (UrlPatternMatcher::match($currentUrl, $showPages)) {
+                $show = true;
             }
 
             // check if category/taxonomy page
@@ -121,18 +115,8 @@ class TawktoGenerator
             $show = true;
 
             $currentUrl = (string) $currentUrl;
-            foreach ($hide_pages as $slug) {
-
-                if (empty(trim($slug))) {
-                    continue;
-                }
-
-                $slug = (string) htmlspecialchars($slug); // we need to add htmlspecialchars due to slashes added when saving to database
-
-                if ($currentUrl == $slug) {
-                    $show = false;
-                    break;
-                }
+            if (UrlPatternMatcher::match($currentUrl, $hide_pages)) {
+                $show = false;
             }
         }
 
@@ -203,6 +187,46 @@ class TawktoGenerator
                     display: block;
                 }
             }
+
+            /* Tooltip */
+            .tooltip {
+            position: relative;
+            display: inline;
+            color: #03a84e;
+            }
+
+            .tooltip .tooltiptext {
+            visibility: hidden;
+            background-color: #545454;
+            color: #fff;
+            text-align: center;
+            padding: 0.5rem;
+            max-width: 300px;
+            border-radius: 0.5rem;
+            line-height: 0.9;
+
+            /* Position the tooltip text - see examples below! */
+            position: absolute;
+            z-index: 1000;
+            top: 12px;
+            }
+
+            .tooltip .tooltiptext::before {
+            content: "";
+            display: block;
+            width: 0;
+            height: 0;
+            position: absolute;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid #545454;
+            top: -5px;
+            left: 5px;
+            }
+
+            .tooltip:hover .tooltiptext {
+            visibility: visible;
+            }
         </style>
         <?php if (!$sameUser) : ?>
             <div id="widget_already_set" style="width: 100%; float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold; margin: 20px 0;" class="alert alert-warning">Notice: Widget already set by other user</div>
@@ -247,10 +271,39 @@ class TawktoGenerator
                                         <textarea class="form-control hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
                                     <?php endif; ?>
                                     <br>
-                                    <p style="text-align: justify;">
-                                    Add URLs to pages in which you would like to hide the widget. ( if "always show" is checked )<br>
-                                    Put each URL in a new line.
-                                    </p>
+                                    <div style="text-align: justify;">
+                                        Add URLs to pages in which you would like to hide the widget. ( if "always show" is checked )<br>
+                                        Put each URL/path in a new line. Paths should have a leading '/'.
+                                        <br>
+                                        <div class="tooltip">
+                                            Examples of accepted path patterns
+                                            <ul class="tooltiptext">
+                                                <li>*</li>
+                                                <li>*/to/somewhere</li>
+                                                <li>/*/to/somewhere</li>
+                                                <li>/path/*/somewhere</li>
+                                                <li>/path/*/lead/*/somewhere</li>
+                                                <li>/path/*/*/somewhere</li>
+                                                <li>/path/to/*</li>
+                                                <li>/path/to/*/</li>
+                                                <li>*/to/*/page</li>
+                                                <li>/*/to/*/page</li>
+                                                <li>/path/*/other/*</li>
+                                                <li>/path/*/other/*/</li>
+                                                <li>http://www.example.com/</li>
+                                                <li>http://www.example.com/*</li>
+                                                <li>http://www.example.com/*/to/somewhere</li>
+                                                <li>http://www.example.com/path/*/somewhere</li>
+                                                <li>http://www.example.com/path/*/lead/*/somewhere</li>
+                                                <li>http://www.example.com/path/*/*/somewhere</li>
+                                                <li>http://www.example.com/path/to/*</li>
+                                                <li>http://www.example.com/path/to/*/</li>
+                                                <li>http://www.example.com/*/to/*/page</li>
+                                                <li>http://www.example.com/path/*/other/*</li>
+                                                <li>http://www.example.com/path/*/other/*/</li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -298,10 +351,39 @@ class TawktoGenerator
                                         <textarea class="form-control show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
                                     <?php endif; ?>
                                     <br>
-                                    <p style="text-align: justify;">
-                                    Add URLs to pages in which you would like to show the widget.<br>
-                                    Put each URL in a new line.
-                                    </p>
+                                    <div style="text-align: justify;">
+                                        Add URLs to pages in which you would like to show the widget.<br>
+                                        Put each URL/path in a new line. Paths should have a leading '/'.
+                                        <br>
+                                        <div class="tooltip">
+                                            Examples of accepted path patterns
+                                            <ul class="tooltiptext">
+                                                <li>*</li>
+                                                <li>*/to/somewhere</li>
+                                                <li>/*/to/somewhere</li>
+                                                <li>/path/*/somewhere</li>
+                                                <li>/path/*/lead/*/somewhere</li>
+                                                <li>/path/*/*/somewhere</li>
+                                                <li>/path/to/*</li>
+                                                <li>/path/to/*/</li>
+                                                <li>*/to/*/page</li>
+                                                <li>/*/to/*/page</li>
+                                                <li>/path/*/other/*</li>
+                                                <li>/path/*/other/*/</li>
+                                                <li>http://www.example.com/</li>
+                                                <li>http://www.example.com/*</li>
+                                                <li>http://www.example.com/*/to/somewhere</li>
+                                                <li>http://www.example.com/path/*/somewhere</li>
+                                                <li>http://www.example.com/path/*/lead/*/somewhere</li>
+                                                <li>http://www.example.com/path/*/*/somewhere</li>
+                                                <li>http://www.example.com/path/to/*</li>
+                                                <li>http://www.example.com/path/to/*/</li>
+                                                <li>http://www.example.com/*/to/*/page</li>
+                                                <li>http://www.example.com/path/*/other/*</li>
+                                                <li>http://www.example.com/path/*/other/*/</li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
