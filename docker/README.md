@@ -10,6 +10,9 @@ Docker containers for Drupal
 - install docker-compose [http://docs.docker.com/compose/install/](http://docs.docker.com/compose/install/)
 
 ## Usage
+Build using defined environment:
+- ```cd ./docker && ./build.sh envs/<env-file>```
+
 Start the container:
 - ```docker-compose --env-file envs/<env-file> up```
 
