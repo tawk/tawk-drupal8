@@ -92,7 +92,9 @@ class TawktoGenerator
         // prepare visibility
         $currentUrl = $base_url.$_SERVER["REQUEST_URI"];
         if ($options->always_display == false) {
-            if (UrlPatternMatcher::match($currentUrl, $showPages)) {
+            $show_pages = json_decode($options->show_oncustom);
+
+            if (UrlPatternMatcher::match($currentUrl, $show_pages)) {
                 $show = true;
             }
 
