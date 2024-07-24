@@ -52,7 +52,7 @@ class TawktoGenerator
                 $username = $user->get('name')->value;
                 $usermail = $user->get('mail')->value;
 
-                $apiString = '$_Tawk_API.visitor = {
+                $apiString = 'Tawk_API.visitor = {
                     name  : "'.$username.'",
                     email : "'.$usermail.'",
                 };';
@@ -62,7 +62,7 @@ class TawktoGenerator
         ob_start();
         ?><!--Start of Tawk.to Script-->
           <script type="text/javascript">
-          var $_Tawk_API={},$_Tawk_LoadStart=new Date();
+          var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();
           (function(){
           var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
           s1.async=true;
