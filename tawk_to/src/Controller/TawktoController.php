@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\tawk_to\Controller;
 
 use Drupal\tawk_to\core\TawktoGenerator;
@@ -19,7 +20,7 @@ class TawktoController extends ControllerBase
     }
 
     public function admin()
-    {   
+    {
         $widget = $this->generator->widget();
         $this->loggerFactory->get('default')->debug($widget);
 
@@ -59,9 +60,9 @@ class TawktoController extends ControllerBase
         // return new Response($this->generator->getIframe());
 
         $build = array(
-                '#type' => 'inline_template',
-                '#template' => $this->generator->getIframe()
-            );
+            '#type' => 'inline_template',
+            '#template' => $this->generator->getIframe()
+        );
         return $build;
     }
 
@@ -69,7 +70,7 @@ class TawktoController extends ControllerBase
     {
         if (!empty($_REQUEST) && 'POST' == $_SERVER["REQUEST_METHOD"]) {
             foreach ($_REQUEST as $key => $value) {
-                if (stripos($key, 'SESS')!== false) {
+                if (stripos($key, 'SESS') !== false) {
                     if ($value == \Drupal::service('session')->getId()) {
                         return $this->_set($_REQUEST);
                     }
@@ -90,7 +91,7 @@ class TawktoController extends ControllerBase
     {
         if (!empty($_REQUEST) && 'POST' == $_SERVER["REQUEST_METHOD"]) {
             foreach ($_REQUEST as $key => $value) {
-                if (stripos($key, 'SESS')!== false) {
+                if (stripos($key, 'SESS') !== false) {
                     if ($value == \Drupal::service('session')->getId()) {
                         return $this->_remove();
                     }
