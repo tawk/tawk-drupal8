@@ -13,8 +13,8 @@
         }
     },
     "scripts": {
-        "build:prod": "COMPOSER_VENDOR_DIR=./tawk_to/vendor composer install --no-dev",
-        "package": "composer run clean && mkdir -p ./tmp && cp -r ./tawk_to ./tmp && (cd ./tmp && zip -9 -rq ./tawk_to.zip ./tawk_to)",
+        "build:prod": "composer install --no-dev",
+        "package": "composer run clean && mkdir -p ./tmp && cp -rt ./tmp config src vendor composer.* tawk_to.* && (cd ./tmp && zip -9 -rq ./tawk_to.zip .)",
         "clean": "rm -rf ./tmp"
     }
 }
