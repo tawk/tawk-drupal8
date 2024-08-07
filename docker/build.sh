@@ -16,7 +16,7 @@ echo "Installing dependency"
 composer run build:prod --working-dir=$build_dir/..
 
 echo "Copying files to module folder";
-cp -r $build_dir/../tawk_to/* $module_dir
+cp -rt $module_dir $build_dir/../config $build_dir/../src $build_dir/../vendor $build_dir/../composer.* $build_dir/../tawk_to.*
 
 echo "Done building module folder";
 
