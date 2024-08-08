@@ -17,7 +17,7 @@ tawk_to.widget:
 tawk_to.set_widget:
     path: /admin/config/tawk_to/set_widget
     defaults:
-        _controller: Drupal\tawk_to\Controller\TawktoController::set_widget
+        _controller: Drupal\tawk_to\Controller\TawktoController::setWidget
         _title: 'Set tawk.to Widget'
     requirements:
         _permission: 'administer site configuration'
@@ -25,7 +25,7 @@ tawk_to.set_widget:
 tawk_to.remove_widget:
     path: /admin/config/tawk_to/remove_widget
     defaults:
-        _controller: Drupal\tawk_to\Controller\TawktoController::remove_widget
+        _controller: Drupal\tawk_to\Controller\TawktoController::removeWidget
         _title: 'Remove tawk.to Widget'
     requirements:
         _permission: 'administer site configuration'
@@ -33,7 +33,7 @@ tawk_to.remove_widget:
 tawk_to.set_options:
     path: /admin/config/tawk_to/set_options
     defaults:
-        _controller: Drupal\tawk_to\Controller\TawktoController::set_options
+        _controller: Drupal\tawk_to\Controller\TawktoController::setOptions
         _title: 'Set tawk.to widget options'
     requirements:
         _permission: 'administer site configuration'
