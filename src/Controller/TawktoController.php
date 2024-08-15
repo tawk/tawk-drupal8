@@ -5,6 +5,7 @@ namespace Drupal\tawk_to\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Logger\LoggerChannelFactory;
 use Drupal\tawk_to\core\TawktoGenerator;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -21,6 +22,19 @@ class TawktoController extends ControllerBase {
   public function __construct(TawktoGenerator $generator, LoggerChannelFactory $loggerFactory) {
     $this->generator = $generator;
     $this->loggerFactory = $loggerFactory;
+  }
+
+  /**
+   * Create new instance of controller.
+   *
+   * @return Drupal\Core\Controller\ControllerBase
+   *   Controller instance
+   */
+  public static function create(ContainerInterface $container) {
+    $generator = $container->get('tawk_to.chat_generator');
+    $logger = $container->get('logger.factory');
+
+    return new static($generator, $logger);
   }
 
   /**
