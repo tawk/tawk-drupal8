@@ -25,13 +25,18 @@ class TawktoGenerator {
 
   /**
    * Calls getWidget()
+   *
+   * @todo rename references to getWidget
    */
   public function widget() {
     return $this->getWidget();
   }
 
   /**
-   * Return widget details from the database.
+   * Render widget output.
+   *
+   * @return string|false
+   *   Widget output
    */
   public function getWidget() {
     $widgetVars = $this->getWidgetVars();
@@ -90,6 +95,12 @@ class TawktoGenerator {
 
   /**
    * Check widget visibility based on set options.
+   *
+   * @param string|null $options
+   *   Current visibility options.
+   *
+   * @return bool
+   *   Whether to display widget
    */
   private function shouldDisplayWidget($options = NULL) {
     if (!$options || is_null($options)) {
@@ -140,6 +151,8 @@ class TawktoGenerator {
 
   /**
    * Get current settings.
+   *
+   * @todo remove - unused
    */
   public function settings() {
     // Default settings.
@@ -151,6 +164,9 @@ class TawktoGenerator {
 
   /**
    * Constructs url for configuration iframe.
+   *
+   * @return string
+   *   Iframe URL
    */
   public function getIframeUrl() {
     $widget = $this->getWidgetVars();
@@ -166,6 +182,9 @@ class TawktoGenerator {
 
   /**
    * Base url for tawk.to application which serves iframe.
+   *
+   * @return string
+   *   Base URL
    */
   public function getBaseUrl() {
     return 'https://plugins.tawk.to';
@@ -173,6 +192,9 @@ class TawktoGenerator {
 
   /**
    * Get admin settings template.
+   *
+   * @return string|false
+   *   Template output
    */
   public function getIframe() {
     $baseUrl = $this->getBaseUrl();
@@ -548,6 +570,9 @@ class TawktoGenerator {
 
   /**
    * Get current widget configuration.
+   *
+   * @return array[string]string
+   *   Current widget configuration
    */
   public function getWidgetVars() {
     $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
@@ -561,6 +586,14 @@ class TawktoGenerator {
 
   /**
    * Set widget configuration.
+   *
+   * @param string $page
+   *   Page ID.
+   * @param string $widget
+   *   Widget ID.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
    */
   public function setWidget($page, $widget) {
     $page = trim($page);
@@ -590,6 +623,9 @@ class TawktoGenerator {
 
   /**
    * Remove widget configuration.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
    */
   public function removeWidget() {
     $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
@@ -607,6 +643,12 @@ class TawktoGenerator {
 
   /**
    * Sets additional options for widget.
+   *
+   * @param string $options
+   *   Options.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
    */
   public function setOptions($options) {
     if (!$options) {

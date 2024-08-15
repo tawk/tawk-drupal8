@@ -19,6 +19,12 @@ class TawktoController extends ControllerBase {
    */
   private $generator;
 
+  /**
+   * Class __construct method.
+   *
+   * @return void
+   *   null
+   */
   public function __construct(TawktoGenerator $generator, LoggerChannelFactory $loggerFactory) {
     $this->generator = $generator;
     $this->loggerFactory = $loggerFactory;
@@ -39,6 +45,9 @@ class TawktoController extends ControllerBase {
 
   /**
    * Chat widget endpoint.
+   *
+   * @return Symfony\Component\HttpFoundation\Response
+   *   Widget response
    */
   public function widget() {
     $widget = $this->generator->widget();
@@ -47,6 +56,9 @@ class TawktoController extends ControllerBase {
 
   /**
    * Admin settings endpoint.
+   *
+   * @return array[string]mixed
+   *   Admin settings template
    */
   public function settings() {
     $build = [
@@ -58,6 +70,9 @@ class TawktoController extends ControllerBase {
 
   /**
    * Set widget configuration endpoint.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
    */
   public function setWidget() {
     if (!empty($_REQUEST) && 'POST' == $_SERVER["REQUEST_METHOD"]) {
@@ -73,6 +88,9 @@ class TawktoController extends ControllerBase {
 
   /**
    * Set widget configuration.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
    */
   private function set($params) {
     $pid = '';
@@ -83,6 +101,9 @@ class TawktoController extends ControllerBase {
 
   /**
    * Remove widget configuration endpoint.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
    */
   public function removeWidget() {
     if (!empty($_REQUEST) && 'POST' == $_SERVER["REQUEST_METHOD"]) {
@@ -98,6 +119,9 @@ class TawktoController extends ControllerBase {
 
   /**
    * Set additional options endpoint.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
    */
   public function setOptions() {
     if (!empty($_REQUEST['options']) && 'POST' == $_SERVER["REQUEST_METHOD"]) {
@@ -108,6 +132,9 @@ class TawktoController extends ControllerBase {
 
   /**
    * Remove widget.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
    */
   private function remove() {
     return $this->generator->removeWidget();

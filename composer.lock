@@ -365,12 +365,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "638cfb69ad6819e3d2e479c9523b879f771b2ef7"
+                "reference": "6fbbc1078094d905f0773421f13830744a144d1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/638cfb69ad6819e3d2e479c9523b879f771b2ef7",
-                "reference": "638cfb69ad6819e3d2e479c9523b879f771b2ef7",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/6fbbc1078094d905f0773421f13830744a144d1e",
+                "reference": "6fbbc1078094d905f0773421f13830744a144d1e",
                 "shasum": ""
             },
             "require": {
@@ -438,7 +438,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2024-08-05T00:27:27+00:00"
+            "time": "2024-08-13T18:32:44+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -594,12 +594,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "564ae854c0a958fe27caf4f864f1a25e226e496f"
+                "reference": "4bc6a9f0f62bc549a9a58080f02d1a165a7c2999"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/564ae854c0a958fe27caf4f864f1a25e226e496f",
-                "reference": "564ae854c0a958fe27caf4f864f1a25e226e496f",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/4bc6a9f0f62bc549a9a58080f02d1a165a7c2999",
+                "reference": "4bc6a9f0f62bc549a9a58080f02d1a165a7c2999",
                 "shasum": ""
             },
             "require": {
@@ -658,7 +658,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-08-05T08:22:14+00:00"
+            "time": "2024-08-12T10:26:02+00:00"
         }
     ],
     "aliases": [],

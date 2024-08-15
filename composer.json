@@ -20,8 +20,8 @@
         }
     },
     "scripts": {
-        "lint": "phpcs -p -s -v --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,css,info,txt,md,yml --ignore=vendor/*,docker/* --runtime-set ignore_warnings_on_exit true .",
-        "lint:fix": "phpcbf -p -s -v --standard=Drupal --extensions=php,module,inc,install,test,profile,theme,css,info,txt,md,yml --ignore=vendor/*,docker/* .; err=$?; if [ $err -eq 1 ]; then exit 0; else exit $err; fi;",
+        "lint": "phpcs -p -s -v --runtime-set ignore_warnings_on_exit true .",
+        "lint:fix": "phpcbf -p -s -v .; err=$?; if [ $err -eq 1 ]; then exit 0; else exit $err; fi;",
         "build:prod": "composer install --no-dev",
         "package": "composer run clean && mkdir -p ./tmp && cp -rt ./tmp config src vendor composer.* tawk_to.* && (cd ./tmp && zip -9 -rq ./tawk_to.zip .)",
         "clean": "rm -rf ./tmp"
