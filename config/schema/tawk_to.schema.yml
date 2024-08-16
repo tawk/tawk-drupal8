@@ -11,6 +11,12 @@ tawk_to.settings:
         widget_id:
           type: text
           label: 'Widget ID:'
+        user_id:
+          type: text
+          label: 'User ID:'
+        options:
+          type: text
+          label: 'Options:'
 block.settings.tawk_to_block:
   type: block_settings
   label: 'tawk.to block'
