@@ -1,5 +1,4 @@
 docker/bin
-/tawk_to/vendor
+/tawk_to
 /vendor
-/tmp
 .phpcs.cache

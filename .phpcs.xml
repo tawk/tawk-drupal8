@@ -5,7 +5,7 @@
 	<exclude-pattern>\.github/*</exclude-pattern>
 	<exclude-pattern>*/docker/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
-	<exclude-pattern>*/tmp/*</exclude-pattern>
+	<exclude-pattern>*/tawk_to/*</exclude-pattern>
 
 	<arg value="ps"/>
 	<arg name="colors"/>

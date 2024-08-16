@@ -22,9 +22,10 @@
     "scripts": {
         "lint": "phpcs -p -s -v --runtime-set ignore_warnings_on_exit true .",
         "lint:fix": "phpcbf -p -s -v .; err=$?; if [ $err -eq 1 ]; then exit 0; else exit $err; fi;",
+        "build:dev": "composer install",
         "build:prod": "composer install --no-dev",
-        "package": "composer run clean && mkdir -p ./tmp && cp -rt ./tmp config src vendor composer.* tawk_to.* && (cd ./tmp && zip -9 -rq ./tawk_to.zip .)",
-        "clean": "rm -rf ./tmp"
+        "package": "composer run clean && mkdir -p ./tawk_to && cp -rt ./tawk_to config src vendor composer.* tawk_to.* && zip -9 -rq ./tawk_to/tawk_to.zip ./tawk_to",
+        "clean": "rm -rf ./tawk_to"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.10",
