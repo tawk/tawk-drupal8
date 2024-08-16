@@ -16,7 +16,7 @@ jobs:
         uses: actions/cache@v2
         id: cached-dependencies
         with:
-          path: ./tawk_to/vendor
+          path: ./vendor
           # the key will change if composer.lock changes
           key: ${{ runner.os }}-dependencies-${{ hashFiles('**/composer.lock') }}
 
@@ -26,7 +26,7 @@ jobs:
           command: run build:prod
 
       - name: build artifact
-        run: composer run package && mv ./tmp/tawk_to.zip tawk_to.zip
+        run: composer run package && mv ./tawk_to/tawk_to.zip tawk_to.zip
 
       - name: upload artifact
         uses: actions/upload-release-asset@v1
