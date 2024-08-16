@@ -1,66 +1,80 @@
 <?php
+
 namespace Drupal\tawk_to\core;
 
-require_once drupal_get_path('module', 'tawk_to').'/vendor/autoload.php';
+require_once drupal_get_path('module', 'tawk_to') . '/vendor/autoload.php';
 
+use Drupal\Core\Cache\Cache;
+use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use \Drupal\Core\Cache\Cache;
 use Tawk\Modules\UrlPatternMatcher;
 
-define('TAWK_TO_WIDGET_PID', 'tawk_to_widget_pid'); // page ID
-define('TAWK_TO_WIDGET_WID', 'tawk_to_widget_wid'); // widget ID
-define('TAWK_TO_WIDGET_OPTS', 'tawk_to_widget_options'); // options
-define('TAWK_TO_WIDGET_UID', 'tawk_to_widget_uid'); // user ID
+// Page ID.
+define('TAWK_TO_WIDGET_PID', 'tawk_to_widget_pid');
+// Widget ID.
+define('TAWK_TO_WIDGET_WID', 'tawk_to_widget_wid');
+// Options.
+define('TAWK_TO_WIDGET_OPTS', 'tawk_to_widget_options');
+// User ID.
+define('TAWK_TO_WIDGET_UID', 'tawk_to_widget_uid');
 
+/**
+ * Provides frontend for chat widget and admin settings.
+ */
+class TawktoGenerator {
 
-class TawktoGenerator
-{
-    public function widget()
-    {
-        return $this->getWidget();
+  /**
+   * Calls getWidget()
+   *
+   * @todo rename references to getWidget
+   */
+  public function widget() {
+    return $this->getWidget();
+  }
+
+  /**
+   * Render widget output.
+   *
+   * @return string|false
+   *   Widget output
+   */
+  public function getWidget() {
+    $widgetVars = $this->getWidgetVars();
+    extract($widgetVars);
+    if (!$page_id || !$widget_id) {
+      return '';
     }
 
+    if (!$this->shouldDisplayWidget($options)) {
+      return '';
+    }
 
-    /**
-     * Return widget details from the database.
-     */
-    public function getWidget()
-    {
-        $widgetVars = $this->getWidgetVars();
-        extract($widgetVars);
-        if (!$page_id || !$widget_id) {
-            return '';
-        }
+    $display_opts = $options;
+    // Default value.
+    $enable_visitor_recognition = TRUE;
+    if (!is_null($display_opts)) {
+      $display_opts = json_decode($display_opts);
 
-        if (!$this->shouldDisplayWidget($options)) {
-            return '';
-        }
+      if (!is_null($display_opts->enable_visitor_recognition)) {
+        $enable_visitor_recognition = $display_opts->enable_visitor_recognition;
+      }
+    }
 
-        $display_opts = $options;
-        $enable_visitor_recognition = true; // default value
-        if (!is_null($display_opts)) {
-            $display_opts = json_decode($display_opts);
+    if ($enable_visitor_recognition) {
+      $user = User::load(\Drupal::currentUser()->id());
+      if ($user) {
+        $username = $user->get('name')->value;
+        $usermail = $user->get('mail')->value;
 
-            if (!is_null($display_opts->enable_visitor_recognition)) {
-                $enable_visitor_recognition = $display_opts->enable_visitor_recognition;
-            }
-        }
-
-        if ($enable_visitor_recognition) {
-            $user = \Drupal\user\Entity\User::load(\Drupal::currentUser()->id());
-            if ($user) {
-                $username = $user->get('name')->value;
-                $usermail = $user->get('mail')->value;
-
-                $apiString = 'Tawk_API.visitor = {
-                    name  : "'.$username.'",
-                    email : "'.$usermail.'",
+        $apiString = 'Tawk_API.visitor = {
+                    name  : "' . $username . '",
+                    email : "' . $usermail . '",
                 };';
-            }
-        }
+      }
+    }
 
-        ob_start();
-        ?><!--Start of Tawk.to Script-->
+    ob_start();
+    ?><!--Start of Tawk.to Script-->
           <script type="text/javascript">
           var Tawk_API=Tawk_API||{},Tawk_LoadStart=new Date();
           (function(){
@@ -74,108 +88,132 @@ class TawktoGenerator
           <?php echo $apiString; ?>
           </script>
           <!--End of Tawk.to Script--><?php
-        $output = ob_get_contents();
-        ob_end_clean();
-        return $output;
+          $output = ob_get_contents();
+          ob_end_clean();
+          return $output;
+  }
+
+  /**
+   * Check widget visibility based on set options.
+   *
+   * @param string|null $options
+   *   Current visibility options.
+   *
+   * @return bool
+   *   Whether to display widget
+   */
+  private function shouldDisplayWidget($options = NULL) {
+    if (!$options || is_null($options)) {
+      // Since always_show's default value is true.
+      return TRUE;
     }
 
-    private function shouldDisplayWidget($options = null)
-    {
-        if (!$options || is_null($options)) {
-            return true; // since always_show's default value is true
+    global $base_url;
+    $options = json_decode($options);
+    $show = FALSE;
+
+    // Prepare visibility.
+    $currentUrl = $base_url . $_SERVER["REQUEST_URI"];
+    if ($options->always_display == FALSE) {
+      $show_pages = json_decode($options->show_oncustom);
+
+      if (UrlPatternMatcher::match($currentUrl, $show_pages)) {
+        $show = TRUE;
+      }
+
+      // Check if category/taxonomy page
+      // taxonomy page.
+      if ("taxonomy_term" == strtolower(\Drupal::request()->attributes->get('view_id'))) {
+        if (FALSE != $options->show_oncategory) {
+          $show = TRUE;
         }
+      }
 
-        global $base_url;
-        $options = json_decode($options);
-        $show = false;
-
-        // prepare visibility
-        $currentUrl = $base_url.$_SERVER["REQUEST_URI"];
-        if ($options->always_display == false) {
-            $show_pages = json_decode($options->show_oncustom);
-
-            if (UrlPatternMatcher::match($currentUrl, $show_pages)) {
-                $show = true;
-            }
-
-            // check if category/taxonomy page
-            // taxonomy page
-            if ("taxonomy_term" == strtolower(\Drupal::request()->attributes->get('view_id'))) {
-                if (false != $options->show_oncategory) {
-                    $show = true;
-                }
-            }
-
-            // check if frontpage
-            if (\Drupal::service('path.matcher')->isFrontPage()) {
-                if (false != $options->show_onfrontpage) {
-                    $show = true;
-                }
-            }
-        } else {
-            $hide_pages = json_decode($options->hide_oncustom);
-            $show = true;
-
-            $currentUrl = (string) $currentUrl;
-            if (UrlPatternMatcher::match($currentUrl, $hide_pages)) {
-                $show = false;
-            }
+      // Check if frontpage.
+      if (\Drupal::service('path.matcher')->isFrontPage()) {
+        if (FALSE != $options->show_onfrontpage) {
+          $show = TRUE;
         }
+      }
+    }
+    else {
+      $hide_pages = json_decode($options->hide_oncustom);
+      $show = TRUE;
 
-        return $show;
+      $currentUrl = (string) $currentUrl;
+      if (UrlPatternMatcher::match($currentUrl, $hide_pages)) {
+        $show = FALSE;
+      }
     }
 
-    public function settings()
-    {
-        // Default settings.
-        $config = \Drupal::config('tawk_to.settings');
-        // Page title and source text.
-        $page_id = $config->get('tawk_to.page_id');
-        $widget_id = $config->get('tawk_to.widget_id');
+    return $show;
+  }
+
+  /**
+   * Get current settings.
+   *
+   * @todo remove - unused
+   */
+  public function settings() {
+    // Default settings.
+    $config = \Drupal::config('tawk_to.settings');
+    // Page title and source text.
+    $page_id = $config->get('tawk_to.page_id');
+    $widget_id = $config->get('tawk_to.widget_id');
+  }
+
+  /**
+   * Constructs url for configuration iframe.
+   *
+   * @return string
+   *   Iframe URL
+   */
+  public function getIframeUrl() {
+    $widget = $this->getWidgetVars();
+    extract($widget);
+    if (!$page_id || !$widget_id) {
+      $widget = [
+        'page_id'   => '',
+        'widget_id' => '',
+      ];
+    }
+    return $this->getBaseUrl() . '/generic/widgets?currentWidgetId=' . $widget['widget_id'] . '&currentPageId=' . $widget['page_id'];
+  }
+
+  /**
+   * Base url for tawk.to application which serves iframe.
+   *
+   * @return string
+   *   Base URL
+   */
+  public function getBaseUrl() {
+    return 'https://plugins.tawk.to';
+  }
+
+  /**
+   * Get admin settings template.
+   *
+   * @return string|false
+   *   Template output
+   */
+  public function getIframe() {
+    $baseUrl = $this->getBaseUrl();
+    $iframeUrl = $this->getIframeUrl();
+
+    $vars = $this->getWidgetVars();
+    extract($vars);
+
+    $sameUser = FALSE;
+    if (is_null($user_id) || \Drupal::currentUser()->id() == $user_id) {
+      $sameUser = TRUE;
     }
 
-    /**
-     * Constructs url for configuration iframe.
-     */
-    public function getIframeUrl()
-    {
-        $widget = $this->getWidgetVars();
-        extract($widget);
-        if (!$page_id || !$widget_id) {
-            $widget = array(
-                'page_id'   => '',
-                'widget_id' => '',
-            );
-        }
-        return $this->getBaseUrl() . '/generic/widgets?currentWidgetId=' . $widget['widget_id'] . '&currentPageId=' . $widget['page_id'];
+    $display_opts = $options;
+    if (!is_null($display_opts)) {
+      $display_opts = json_decode($display_opts);
     }
-
-    /**
-     * Base url for tawk.to application which serves iframe.
-     */
-    public function getBaseUrl() {
-      return 'https://plugins.tawk.to';
-    }
-
-    public function getIframe()
-    {
-        $baseUrl = $this->getBaseUrl();
-        $iframeUrl = $this->getIframeUrl();
-
-        $vars = $this->getWidgetVars();
-        extract($vars);
-
-        $sameUser = false;
-        if (is_null($user_id) || \Drupal::currentUser()->id()==$user_id) {
-            $sameUser = true;
-        }
-
-        $display_opts = $options;
-        if (!is_null($display_opts)) {
-            $display_opts = json_decode($display_opts);
-        }
-        ob_start();
-        ?>
+    ob_start();
+    ?>
         <link href="https://plugins.tawk.to/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
         <style>
@@ -250,15 +288,15 @@ class TawktoGenerator
                                 <label for="always_display" class="col-xs-6 control-label">Always show Tawk.To widget on every page</label>
                                 <div class="col-xs-6 control-label ">
                                     <?php
-                                    $checked = true;
+                                    $checked = TRUE;
                                     if (!is_null($display_opts)) {
-                                        if (!$display_opts->always_display) {
-                                            $checked = false;
-                                        }
+                                      if (!$display_opts->always_display) {
+                                        $checked = FALSE;
+                                      }
                                     }
                                     ?>
                                     <input type="checkbox" class="checkbox" name="always_display" id="always_display" value="1"
-                                        <?php echo ($checked)?'checked':'';?> />
+                                        <?php echo ($checked) ? 'checked' : '';?> />
                                 </div>
                             </div>
 
@@ -268,7 +306,10 @@ class TawktoGenerator
                                     <?php if (!empty($display_opts->hide_oncustom)) : ?>
                                         <?php $whitelist = json_decode($display_opts->hide_oncustom) ?>
                                         <textarea class="form-control hide_specific" name="hide_oncustom"
-                                            id="hide_oncustom" cols="30" rows="10"><?php foreach ($whitelist as $page) { echo $page."\r\n"; } ?></textarea>
+                                            id="hide_oncustom" cols="30" rows="10"><?php
+                                            foreach ($whitelist as $page) {
+                                              echo $page . "\r\n";
+                                            } ?></textarea>
                                     <?php else : ?>
                                         <textarea class="form-control hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
                                     <?php endif; ?>
@@ -313,16 +354,16 @@ class TawktoGenerator
                                 <label for="show_onfrontpage" class="col-xs-6 control-label">Show on frontpage</label>
                                 <div class="col-xs-6 control-label ">
                                     <?php
-                                    $checked = false;
+                                    $checked = FALSE;
                                     if (!is_null($display_opts)) {
-                                        if ($display_opts->show_onfrontpage) {
-                                            $checked = true;
-                                        }
+                                      if ($display_opts->show_onfrontpage) {
+                                        $checked = TRUE;
+                                      }
                                     }
                                     ?>
                                     <input type="checkbox" class="checkbox show_specific" name="show_onfrontpage"
                                         id="show_onfrontpage" value="1"
-                                        <?php echo ($checked)?'checked':'';?> />
+                                        <?php echo ($checked) ? 'checked' : '';?> />
                                 </div>
                             </div>
 
@@ -330,15 +371,15 @@ class TawktoGenerator
                                 <label for="show_oncategory" class="col-xs-6 control-label">Show on category pages</label>
                                 <div class="col-xs-6 control-label ">
                                     <?php
-                                    $checked = false;
+                                    $checked = FALSE;
                                     if (!is_null($display_opts)) {
-                                        if ($display_opts->show_oncategory) {
-                                            $checked = true;
-                                        }
+                                      if ($display_opts->show_oncategory) {
+                                        $checked = TRUE;
+                                      }
                                     }
                                     ?>
                                     <input type="checkbox" class="checkbox show_specific" name="show_oncategory" id="show_oncategory" value="1"
-                                        <?php echo ($checked)?'checked':'';?>  />
+                                        <?php echo ($checked) ? 'checked' : '';?>  />
                                 </div>
                             </div>
 
@@ -348,7 +389,10 @@ class TawktoGenerator
                                     <?php if (isset($display_opts->show_oncustom) && !empty($display_opts->show_oncustom)) : ?>
                                         <?php $whitelist = json_decode($display_opts->show_oncustom) ?>
                                         <textarea class="form-control show_specific" name="show_oncustom" id="show_oncustom" cols="30"
-                                            rows="10"><?php foreach ($whitelist as $page) { echo $page."\r\n"; } ?></textarea>
+                                            rows="10"><?php
+                                            foreach ($whitelist as $page) {
+                                              echo $page . "\r\n";
+                                            } ?></textarea>
                                     <?php else : ?>
                                         <textarea class="form-control show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
                                     <?php endif; ?>
@@ -397,10 +441,10 @@ class TawktoGenerator
                                 <label for="enable_visitor_recognition" class="col-xs-6 control-label">Enable Visitor Recognition</label>
                                 <div class="col-xs-6 control-label">
                                     <?php
-                                        $checked = 'checked';
-                                        if (!is_null($display_opts) && !$display_opts->enable_visitor_recognition) {
-                                            $checked = '';
-                                        }
+                                    $checked = 'checked';
+                                    if (!is_null($display_opts) && !$display_opts->enable_visitor_recognition) {
+                                      $checked = '';
+                                    }
                                     ?>
                                     <input type="checkbox" class="checkbox" name="enable_visitor_recognition" id="enable_visitor_recognition" value="1"
                                         <?php echo $checked ?> />
@@ -522,109 +566,138 @@ class TawktoGenerator
         $output = ob_get_contents();
         ob_end_clean();
         return $output;
+  }
+
+  /**
+   * Get current widget configuration.
+   *
+   * @return array[string]string
+   *   Current widget configuration
+   */
+  public function getWidgetVars() {
+    $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
+    return [
+      'page_id' => $config->get('tawk_to.page_id'),
+      'widget_id' => $config->get('tawk_to.widget_id'),
+      'user_id' => $config->get('tawk_to.user_id'),
+      'options' => $config->get('tawk_to.options'),
+    ];
+  }
+
+  /**
+   * Set widget configuration.
+   *
+   * @param string $page
+   *   Page ID.
+   * @param string $widget
+   *   Widget ID.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
+   */
+  public function setWidget($page, $widget) {
+    $page = trim($page);
+    $widget = trim($widget);
+
+    $options = ['success' => FALSE];
+    if (!$page || !$widget) {
+      return new JsonResponse($options);
     }
 
-    public function getWidgetVars()
-    {
-        $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
-        return array(
-                'page_id' => $config->get('tawk_to.page_id'),
-                'widget_id' => $config->get('tawk_to.widget_id'),
-                'user_id' => $config->get('tawk_to.user_id'),
-                'options' => $config->get('tawk_to.options')
-            );
+    if (preg_match('/^[0-9A-Fa-f]{24}$/', $page) !== 1
+          || preg_match('/^[a-z0-9]{1,50}$/i', $widget) !== 1) {
+      return new JsonResponse($options);
     }
 
-    public function setWidget($page, $widget)
-    {
-        $page = trim($page);
-        $widget = trim($widget);
+    $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
+    $config->set('tawk_to.page_id', $page);
+    $config->set('tawk_to.widget_id', $widget);
+    $config->set('tawk_to.user_id', \Drupal::currentUser()->id());
+    $config->save();
 
-        $options = array('success' => false);
-        if (!$page || !$widget) {
-            return new JsonResponse($options);
-        }
+    Cache::invalidateTags(['tawk_widget']);
 
-        if (preg_match('/^[0-9A-Fa-f]{24}$/', $page) !== 1
-            || preg_match('/^[a-z0-9]{1,50}$/i', $widget) !== 1) {
-            return new JsonResponse($options);
-        }
+    $options = ['success' => TRUE];
+    return new JsonResponse($options);
+  }
 
-        $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
-        $config->set('tawk_to.page_id', $page);
-        $config->set('tawk_to.widget_id', $widget);
-        $config->set('tawk_to.user_id', \Drupal::currentUser()->id());
-        $config->save();
+  /**
+   * Remove widget configuration.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
+   */
+  public function removeWidget() {
+    $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
+    $config->set('tawk_to.page_id', 0);
+    $config->set('tawk_to.widget_id', 0);
+    $config->set('tawk_to.user_id', NULL);
 
-        Cache::invalidateTags(array('tawk_widget'));
+    $config->save();
 
-        $options = array('success' => true);
-        return new JsonResponse($options);
+    Cache::invalidateTags(['tawk_widget']);
+
+    $options = ['success' => TRUE];
+    return new JsonResponse($options);
+  }
+
+  /**
+   * Sets additional options for widget.
+   *
+   * @param string $options
+   *   Options.
+   *
+   * @return Symfony\Component\HttpFoundation\JsonResponse
+   *   JSON response
+   */
+  public function setOptions($options) {
+    if (!$options) {
+      return new JsonResponse(['success' => FALSE]);
     }
+    $jsonOpts = [
+      'always_display' => FALSE,
+      'hide_oncustom' => FALSE,
+      'show_onfrontpage' => FALSE,
+      'show_oncategory' => FALSE,
+      'show_oncustom' => [],
+      'enable_visitor_recognition' => FALSE,
+    ];
 
-    public function removeWidget()
-    {
-        $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
-        $config->set('tawk_to.page_id', 0);
-        $config->set('tawk_to.widget_id', 0);
-        $config->set('tawk_to.user_id', null);
-
-        $config->save();
-
-        Cache::invalidateTags(array('tawk_widget'));
-
-        $options = array('success' => true);
-        return new JsonResponse($options);
-    }
-
-    public function setOptions($options)
-    {
-        if (!$options) {
-            return new JsonResponse(array('success' => false));
-        }
-        $jsonOpts = array(
-                'always_display' => false,
-                'hide_oncustom' => false,
-                'show_onfrontpage' => false,
-                'show_oncategory' => false,
-                'show_oncustom' => array(),
-                'enable_visitor_recognition' => false
-            );
-
-        $options = explode('&', $options);
-        foreach ($options as $post) {
-            list($column, $value) = explode('=', $post);
-            switch ($column) {
-                case 'hide_oncustom':
-                case 'show_oncustom':
-                    // split by newlines, then remove empty lines
-                    $value = urldecode($value);
-                    $value = str_ireplace("\r", "\n", $value);
-                    $value = explode("\n", $value);
-                    $non_empty_values = array();
-                    foreach ($value as $str) {
-                        $trimmed = trim($str);
-                        if ($trimmed !== '') {
-                            $non_empty_values[] = $trimmed;
-                        }
-                    }
-                    $jsonOpts[$column] = json_encode($non_empty_values);
-                    break;
-
-                case 'show_onfrontpage':
-                case 'show_oncategory':
-                case 'always_display':
-                case 'enable_visitor_recognition':
-                    $jsonOpts[$column] = $value == 1;
-                    break;
+    $options = explode('&', $options);
+    foreach ($options as $post) {
+      [$column, $value] = explode('=', $post);
+      switch ($column) {
+        case 'hide_oncustom':
+        case 'show_oncustom':
+          // Split by newlines, then remove empty lines.
+          $value = urldecode($value);
+          $value = str_ireplace("\r", "\n", $value);
+          $value = explode("\n", $value);
+          $non_empty_values = [];
+          foreach ($value as $str) {
+            $trimmed = trim($str);
+            if ($trimmed !== '') {
+              $non_empty_values[] = $trimmed;
             }
-        }
-        $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
-        $config->set('tawk_to.options', json_encode($jsonOpts));
-        $config->save();
+          }
+          $jsonOpts[$column] = json_encode($non_empty_values);
+          break;
 
-        Cache::invalidateTags(array('tawk_widget'));
-
-        return new JsonResponse(array('success' => true));
+        case 'show_onfrontpage':
+        case 'show_oncategory':
+        case 'always_display':
+        case 'enable_visitor_recognition':
+          $jsonOpts[$column] = $value == 1;
+          break;
+      }
     }
+    $config = \Drupal::service('config.factory')->getEditable('tawk_to.settings');
+    $config->set('tawk_to.options', json_encode($jsonOpts));
+    $config->save();
+
+    Cache::invalidateTags(['tawk_widget']);
+
+    return new JsonResponse(['success' => TRUE]);
+  }
+
 }

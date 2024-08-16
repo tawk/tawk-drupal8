@@ -1,27 +1,31 @@
 <?php
 
+/**
+ * @file
+ * Hooks for tawk.to module.
+ */
+
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\tawk_to\core\TawktoGenerator;
 
 /**
  * Implements hook_help().
  */
-function tawk_to_help($route_name, RouteMatchInterface $route_match)
-{
-    if ($route_name !== 'tawk_to.help') {
-        return;
-    }
+function tawk_to_help($route_name, RouteMatchInterface $route_match) {
+  if ($route_name !== 'tawk_to.help') {
+    return;
+  }
 
-    $links = [
-        ':homepage' => 'https://tawk.to',
-        ':dashboard' => 'https://dashboard.tawk.to',
-        ':project_page' => 'https://www.drupal.org/sandbox/tawk/2205433',
-        ':mail_link' => 'support@tawk.to',
-    ];
-    $output = '';
+  $links = [
+    ':homepage' => 'https://tawk.to',
+    ':dashboard' => 'https://dashboard.tawk.to',
+    ':project_page' => 'https://www.drupal.org/sandbox/tawk/2205433',
+    ':mail_link' => 'support@tawk.to',
+  ];
+  $output = '';
 
-    $output .= '<h3>' . t('About tawk.to') . '</h3>';
-    $output .= '<p>' . t('tawk.to Drupal module allows you to easily choose which one of your tawk.to widgets you
+  $output .= '<h3>' . t('About tawk.to') . '</h3>';
+  $output .= '<p>' . t('tawk.to Drupal module allows you to easily choose which one of your tawk.to widgets you
     want to use on your drupal page. To create account please visit <a href=":project">https://tawk.to</a>.<br />
     To answer chat go to <a href="dashboard">https://dashboard.tawk.to</a>.<br />
     * For a full description of the module, visit the project page:<br />
@@ -29,25 +33,26 @@ function tawk_to_help($route_name, RouteMatchInterface $route_match)
     * To submit bug reports and feature suggestions, or to track changes please email support@tawk.to
     ', $links) . '</p>';
 
-    return $output;
+  return $output;
 }
 
-function tawk_to_page_bottom(array &$page_bottom)
-{
-    // check if current page is admin, so that chat widget is not shown.
-    $route = \Drupal::routeMatch()->getRouteObject();
-    $is_admin_route = \Drupal::service('router.admin_context')->isAdminRoute($route);
-    $has_node_operation_option = $route->getOption('_node_operation_route');
-    $is_admin = ($is_admin_route || $has_node_operation_option);
-    if (!$is_admin) {
-        $generator = new TawktoGenerator;
+/**
+ * Shows chat widget on every page except admin pages.
+ */
+function tawk_to_page_bottom(array &$page_bottom) {
+  $route = \Drupal::routeMatch()->getRouteObject();
+  $is_admin_route = \Drupal::service('router.admin_context')->isAdminRoute($route);
+  $has_node_operation_option = $route->getOption('_node_operation_route');
+  $is_admin = ($is_admin_route || $has_node_operation_option);
+  if (!$is_admin) {
+    $generator = new TawktoGenerator();
 
-        $page_bottom['tawk_to'] = array(
-            '#type' => 'inline_template',
-            '#template' => $generator->widget(),
-            '#cache' => array(
-                'tags' => array('tawk_widget')
-            )
-        );
-    }
+    $page_bottom['tawk_to'] = [
+      '#type' => 'inline_template',
+      '#template' => $generator->widget(),
+      '#cache' => [
+        'tags' => ['tawk_widget'],
+      ],
+    ];
+  }
 }
