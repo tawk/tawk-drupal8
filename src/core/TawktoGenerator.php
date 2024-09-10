@@ -2,7 +2,9 @@
 
 namespace Drupal\tawk_to\core;
 
-require_once drupal_get_path('module', 'tawk_to') . '/vendor/autoload.php';
+if (file_exists(drupal_get_path('module', 'tawk_to') . '/vendor/autoload.php')) {
+  require_once drupal_get_path('module', 'tawk_to') . '/vendor/autoload.php';
+}
 
 use Drupal\Core\Cache\Cache;
 use Drupal\user\Entity\User;
