@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "80d83701b83b4c4248b706387874338d",
+    "content-hash": "e1bc9247613004f4c71ce71b7b1e07a5",
     "packages": [
         {
             "name": "tawk/url-utils",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tawk/tawk-url-utils.git",
-                "reference": "73c166333707d893b0160fa9b5eae7aa8fbfa03c"
+                "reference": "863ee1e9a8812da7079f4e55868a2b6960050612"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tawk/tawk-url-utils/zipball/73c166333707d893b0160fa9b5eae7aa8fbfa03c",
-                "reference": "73c166333707d893b0160fa9b5eae7aa8fbfa03c",
+                "url": "https://api.github.com/repos/tawk/tawk-url-utils/zipball/863ee1e9a8812da7079f4e55868a2b6960050612",
+                "reference": "863ee1e9a8812da7079f4e55868a2b6960050612",
                 "shasum": ""
             },
             "require-dev": {
@@ -32,28 +32,15 @@
                     "Tawk\\Tests\\": "tests"
                 }
             },
-            "scripts": {
-                "post-install-cmd": [
-                    "([ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility)"
-                ],
-                "post-update-cmd": [
-                    "([ $COMPOSER_DEV_MODE -eq 0 ] || vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility)"
-                ],
-                "test": [
-                    "phpunit"
-                ],
-                "lint": [
-                    "phpcs -p -s -v --runtime-set ignore_warnings_on_exit true ."
-                ],
-                "lint:fix": [
-                    "phpcbf -p -s -v .; err=$?; if [ $err -eq 1 ]; then exit 0; else exit $err; fi;"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0"
+            ],
             "support": {
-                "source": "https://github.com/tawk/tawk-url-utils/tree/2.0.1",
-                "issues": "https://github.com/tawk/tawk-url-utils/issues"
+                "issues": "https://github.com/tawk/tawk-url-utils/issues",
+                "source": "https://github.com/tawk/tawk-url-utils/tree/2.0.2"
             },
-            "time": "2022-01-28T11:14:45+00:00"
+            "time": "2024-09-09T08:05:15+00:00"
         }
     ],
     "packages-dev": [
@@ -188,16 +175,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.30.0",
+            "version": "1.30.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "5ceb0e384997db59f38774bf79c2a6134252c08f"
+                "reference": "51b95ec8670af41009e2b2b56873bad96682413e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/5ceb0e384997db59f38774bf79c2a6134252c08f",
-                "reference": "5ceb0e384997db59f38774bf79c2a6134252c08f",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/51b95ec8670af41009e2b2b56873bad96682413e",
+                "reference": "51b95ec8670af41009e2b2b56873bad96682413e",
                 "shasum": ""
             },
             "require": {
@@ -229,9 +216,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.30.0"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.30.1"
             },
-            "time": "2024-08-29T09:54:52+00:00"
+            "time": "2024-09-07T20:13:05+00:00"
         },
         {
             "name": "sirbrillig/phpcs-variable-analysis",
@@ -438,20 +425,20 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.30.0",
+            "version": "v1.31.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "0424dff1c58f028c451efff2045f5d92410bd540"
+                "reference": "a3cc8b044a6ea513310cbd48ef7333b384945638"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/0424dff1c58f028c451efff2045f5d92410bd540",
-                "reference": "0424dff1c58f028c451efff2045f5d92410bd540",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/a3cc8b044a6ea513310cbd48ef7333b384945638",
+                "reference": "a3cc8b044a6ea513310cbd48ef7333b384945638",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1"
+                "php": ">=7.2"
             },
             "provide": {
                 "ext-ctype": "*"
@@ -497,7 +484,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.30.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.31.0"
             },
             "funding": [
                 {
@@ -513,7 +500,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-05-31T15:07:36+00:00"
+            "time": "2024-09-09T11:45:10+00:00"
         },
         {
             "name": "symfony/yaml",

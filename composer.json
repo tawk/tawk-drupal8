@@ -11,13 +11,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "tawk/url-utils": "2.0.1"
-    },
-    "repositories": {
-        "tawk-url-utils": {
-            "type": "vcs",
-            "url": "https://github.com/tawk/tawk-url-utils.git"
-        }
+        "tawk/url-utils": "2.0.2"
     },
     "scripts": {
         "lint": "phpcs -p -s -v --runtime-set ignore_warnings_on_exit true .",
