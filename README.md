@@ -31,11 +31,9 @@ This method is available only if your Drupal installation has composer.
 1. Go to your `<DRUPAL_INSTALLATION>` folder (where `composer.json` lives).
 2. Run `composer require drupal/tawkto`.
 3. Log in to the your administration panel and click on `Extend`.
-4. In the module list, click on the `Install new module` button.
-5. Click on `Choose File`, select the downloaded module, and click on the
-`Install` button.
-6. After the installation completes, click on `Enable newly added modules` to
-complete the installation.
+4. In the module list, search for `tawk.to` and enable the module by ticking the
+checkbox beside `tawk.to Module`.
+5. Click on `Install` button to complete the installation.
 
 ### Configuration
 1. In your administration panel, go to `Configuration`.
