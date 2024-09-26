@@ -9,7 +9,7 @@
             "email": "accounts@tawk.to"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
         "tawk/url-utils": "2.0.2"
     },

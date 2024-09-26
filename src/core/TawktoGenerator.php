@@ -2,8 +2,8 @@
 
 namespace Drupal\tawk_to\core;
 
-if (file_exists(drupal_get_path('module', 'tawk_to') . '/vendor/autoload.php')) {
-  require_once drupal_get_path('module', 'tawk_to') . '/vendor/autoload.php';
+if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
+  require_once __DIR__ . '/../../vendor/autoload.php';
 }
 
 use Drupal\Core\Cache\Cache;
