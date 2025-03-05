@@ -54,11 +54,21 @@ class TawktoGenerator {
     $display_opts = $options;
     // Default value.
     $enable_visitor_recognition = TRUE;
+    $secure_mode_enabled = FALSE;
+    $js_api_key = NULL;
     if (!is_null($display_opts)) {
       $display_opts = json_decode($display_opts);
 
       if (!is_null($display_opts->enable_visitor_recognition)) {
         $enable_visitor_recognition = $display_opts->enable_visitor_recognition;
+      }
+
+      if (!is_null($display_opts->secure_mode_enabled)) {
+        $secure_mode_enabled = $display_opts->secure_mode_enabled;
+      }
+
+      if (!is_null($display_opts->js_api_key)) {
+        $js_api_key = $display_opts->js_api_key;
       }
     }
 
@@ -67,11 +77,22 @@ class TawktoGenerator {
       if ($user) {
         $username = $user->get('name')->value;
         $usermail = $user->get('mail')->value;
+        $hash = NULL;
+
+        $keyModule = $this->getKeyModule();
+        $keys = $keyModule['keys'];
+
+        if ($secure_mode_enabled) {
+          if (!is_null($js_api_key) && isset($keys[$js_api_key])) {
+            $hash = hash_hmac('sha256', $usermail, $keys[$js_api_key]->getKeyValue());
+          }
+        }
 
         $apiString = 'Tawk_API.visitor = {
                     name  : "' . $username . '",
-                    email : "' . $usermail . '",
-                };';
+                    email : "' . $usermail . '",' .
+                    (!is_null($hash) ? PHP_EOL . 'hash  : "' . $hash . '",' : '') .
+                '};';
       }
     }
 
@@ -93,6 +114,26 @@ class TawktoGenerator {
           $output = ob_get_contents();
           ob_end_clean();
           return $output;
+  }
+
+  /**
+   * Get keys.
+   *
+   * @return array
+   *   Key module installed and keys
+   */
+  private function getKeyModule() {
+    $installed = \Drupal::getContainer()->has('key.repository');
+    $keys = [];
+
+    if ($installed) {
+      $keys = \Drupal::service('key.repository')->getKeys();
+    }
+
+    return [
+      'installed' => $installed,
+      'keys' => $keys,
+    ];
   }
 
   /**
@@ -214,6 +255,11 @@ class TawktoGenerator {
     if (!is_null($display_opts)) {
       $display_opts = json_decode($display_opts);
     }
+
+    $keyModule = $this->getKeyModule();
+    $keyModuleInstalled = $keyModule['installed'];
+    $keys = $keyModule['keys'];
+
     ob_start();
     ?>
         <link href="https://plugins.tawk.to/public/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -284,7 +330,7 @@ class TawktoGenerator {
                     <form id="module_form" class="form-horizontal" action="" method="post">
                         <div id="fieldset_1">
                             <div class="panel form-group col-xs-12">
-                                <div class="panel-heading"><strong>Visibility Settings</strong></div>
+                                <div class="panel-heading"><strong>Visibility Options</strong></div>
                             </div>
                             <div class="form-group col-xs-12">
                                 <label for="always_display" class="col-xs-6 control-label">Always show Tawk.To widget on every page</label>
@@ -450,6 +496,52 @@ class TawktoGenerator {
                                     ?>
                                     <input type="checkbox" class="checkbox" name="enable_visitor_recognition" id="enable_visitor_recognition" value="1"
                                         <?php echo $checked ?> />
+                                </div>
+                            </div>
+                        </div>
+                        <div id="fieldset_3">
+                            <div class="panel form-group col-xs-12">
+                                <div class="panel-heading"><strong>Security Options</strong></div>
+                            </div>
+                            <div class="form-group col-xs-12">Note: If Secure Mode is enabled on your property, please enter your Javascript API Key to ensure visitor recognition works correctly.</div>
+                            <div class="form-group col-xs-12">
+                                <label for="secure_mode_enabled" class="col-xs-6 control-label">Secure mode enabled</label>
+                                <div class="col-xs-6 control-label">
+                                    <?php
+                                    $checked = 'checked';
+                                    if (!is_null($display_opts) && !$display_opts->secure_mode_enabled) {
+                                      $checked = '';
+                                    }
+                                    ?>
+                                    <input type="checkbox" class="checkbox" name="secure_mode_enabled" id="secure_mode_enabled" value="1"
+                                        <?php echo $checked ?> />
+                                </div>
+                            </div>
+                            <div class="form-group col-xs-12">
+                                <label for="enable_visitor_recognition" class="col-xs-6 control-label">JavaScript API Key</label>
+                                <div class="col-xs-6 control-label" style="text-align: justify;">
+                                    <?php if (!$keyModuleInstalled) { ?>
+
+                                      <span>The <a target="_blank" href="https://www.drupal.org/project/key">Key</a> module is not installed. Please install it and create a key for JS API Key.</span>
+
+                                    <?php }
+                                    else { ?>
+
+                                      <span>Keys:</span>
+                                      <select name="js_api_key" id="js_api_key">
+                                        <?php
+                                        foreach (array_keys($keys) as $key) {
+                                          $selected = 'selected';
+                                          if (!is_null($display_opts) && $display_opts->js_api_key !== $key) {
+                                            $selected = '';
+                                          }
+                                          ?>
+                                          <option value="<?php echo $key; ?>" <?php echo $selected; ?>><?php echo $key; ?></option>
+                                        <?php } ?>
+                                      </select>
+                                      <div>To create a new key, go to <a href="/admin/config/system/keys">/admin/config/system/keys</a></div>
+
+                                    <?php } ?>
                                 </div>
                             </div>
                         </div>
@@ -685,10 +777,15 @@ class TawktoGenerator {
           $jsonOpts[$column] = json_encode($non_empty_values);
           break;
 
+        case 'js_api_key':
+          $jsonOpts[$column] = trim($value);
+          break;
+
         case 'show_onfrontpage':
         case 'show_oncategory':
         case 'always_display':
         case 'enable_visitor_recognition':
+        case 'secure_mode_enabled':
           $jsonOpts[$column] = $value == 1;
           break;
       }
