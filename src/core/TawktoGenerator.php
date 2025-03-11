@@ -127,7 +127,7 @@ class TawktoGenerator {
     $keys = [];
 
     if ($installed) {
-      $keys = \Drupal::service('key.repository')->getKeys();
+      $keys = \Drupal::service('key.repository')->getKeysByType('authentication');
     }
 
     return [
@@ -542,13 +542,14 @@ class TawktoGenerator {
                                 <div class="col-xs-6 control-label" style="text-align: justify;">
                                     <?php if (!$keyModuleInstalled) { ?>
 
-                                      <span>The <a target="_blank" href="https://www.drupal.org/project/key">Key</a> module is not installed. Please install it and create a key for JS API Key.</span>
+                                      <span>The <a target="_blank" href="https://www.drupal.org/project/key">Key</a> module is not installed. Please install it and create an <b>Authentication</b> key for JS API Key.</span>
 
                                     <?php }
                                     else { ?>
 
                                       <span>Keys:</span>
                                       <select name="js_api_key" id="js_api_key">
+                                        <option value="">Select a key</option>
                                         <?php
                                         foreach (array_keys($keys) as $key) {
                                           $selected = 'selected';
@@ -559,7 +560,7 @@ class TawktoGenerator {
                                           <option value="<?php echo $key; ?>" <?php echo $selected; ?>><?php echo $key; ?></option>
                                         <?php } ?>
                                       </select>
-                                      <div>To create a new key, go to <a href="/admin/config/system/keys">/admin/config/system/keys</a></div>
+                                      <div>To create a new key, go to <a href="/admin/config/system/keys">/admin/config/system/keys</a>.<br>Tawk.to will use an <b>Authentication</b> key to secure the visitor recognition.</div>
 
                                     <?php } ?>
                                 </div>
