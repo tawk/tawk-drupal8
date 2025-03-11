@@ -6,6 +6,7 @@ if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
   require_once __DIR__ . '/../../vendor/autoload.php';
 }
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\Cache;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -89,7 +90,7 @@ class TawktoGenerator {
         }
 
         $apiString = 'Tawk_API.visitor = {
-                    name  : "' . $username . '",
+                    name  : "' . Html::escape($username) . '",
                     email : "' . $usermail . '",' .
                     (!is_null($hash) ? PHP_EOL . 'hash  : "' . $hash . '",' : '') .
                 '};';
