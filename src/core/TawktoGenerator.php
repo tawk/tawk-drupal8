@@ -80,12 +80,11 @@ class TawktoGenerator {
         $usermail = $user->get('mail')->value;
         $hash = NULL;
 
-        $keyModule = $this->getKeyModule();
-        $keys = $keyModule['keys'];
+        if ($secure_mode_enabled && !is_null($js_api_key)) {
+          $key = $this->getKey($js_api_key);
 
-        if ($secure_mode_enabled) {
-          if (!is_null($js_api_key) && isset($keys[$js_api_key])) {
-            $hash = hash_hmac('sha256', $usermail, $keys[$js_api_key]->getKeyValue());
+          if (!is_null($key)) {
+            $hash = hash_hmac('sha256', $usermail, $key);
           }
         }
 
@@ -135,6 +134,26 @@ class TawktoGenerator {
       'installed' => $installed,
       'keys' => $keys,
     ];
+  }
+
+  /**
+   * Get key value.
+   *
+   * @param string $key_id
+   *   Key ID.
+   *
+   * @return string|null
+   *   Key value.
+   */
+  private function getKey($key_id) {
+    $installed = \Drupal::getContainer()->has('key.repository');
+
+    if (!$installed) {
+      return NULL;
+    }
+
+    $key = \Drupal::service('key.repository')->getKey($key_id);
+    return $key->getKeyValue();
   }
 
   /**
